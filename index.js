@@ -34,7 +34,7 @@ app.post('/projects', async (req, res) => {
     const data = req.body
 
     if (!data || !data.name) {
-      console.log('object');
+      
       res.status(400).send("Provide correct data")
       return;
     }
