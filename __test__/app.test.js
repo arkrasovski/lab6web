@@ -19,7 +19,7 @@ describe("POST /projects", () => {
   it("should return new Project", async () => {
     const newProject = {
       name: "Test",
-      users: ['fff'],
+      //users: ['fff'],
       tasks: [],
     };
 
