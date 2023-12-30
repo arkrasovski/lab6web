@@ -31,7 +31,7 @@ app.get('/projects', async (req, res) => {
 
 app.post('/projects', async (req, res) => {
   try {
-    //const data = req.body
+    const data = req.body
 
     if (!data || !data.name) {
       
