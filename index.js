@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require("mongoose");
 const axios = require('axios')
-
+const {ObjectId} = require("bson");
 const morgan = require('morgan')
 
 const Projects = require('./model.js');
@@ -12,7 +12,7 @@ const app = express();
 
 app.use(morgan('combined'))
 
-app.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.get('/', async (_req, res) => {
@@ -23,7 +23,7 @@ app.get('/projects', async (req, res) => {
   try {
     const projects = await Projects.find({});
 
-    res.status(200).send(projects)
+    
   } catch (err) {
     res.status(500).send(`Unexpected error, ${err.message}`)
   }
@@ -34,7 +34,7 @@ app.post('/projects', async (req, res) => {
     const data = req.body
 
     if (!data || !data.name) {
-      
+
       res.status(400).send("Provide correct data")
       return;
     }
@@ -52,16 +52,18 @@ app.post('/projects/add-user', async (req, res) => {
     const { projectId, userId } = req.body
 
     if (!projectId || !userId) {
-      res.status(400).send("Provide correct data")
-      return;
+    res.status(400).send("Provide correct data")
+    return;
     }
-    const project = await Projects.updateOne({_id: projectId}, {
+    const project = await Projects.updateOne({ _id: new ObjectId(projectId) }, {
       $set: {
-        users: [{_id: userId}]
+        users: [{ _id: userId }]
       }
     });
+    console.log(projectId)
+    const updatedProject = await Projects.findOne({ _id:new ObjectId( projectId) });
 
-    res.status(200).send(project)
+    res.status(200).send(updatedProject)
   } catch (err) {
     res.status(500).send(`Unexpected error, ${err.message}`)
   }
@@ -76,9 +78,9 @@ app.post('/projects/task/create', async (req, res) => {
       return;
     }
 
-    const project = await Projects.updateOne({_id: projectId}, {
+    const project = await Projects.updateOne({ _id: projectId }, {
       $push: {
-        tasks: {name, description}
+        tasks: { name, description }
       }
     });
 
@@ -89,15 +91,15 @@ app.post('/projects/task/create', async (req, res) => {
 });
 
 app.get('/projects/:projectId', async (req, res) => {
-  const {projectId} = req.params
+  const { projectId } = req.params
 
   try {
     if (!projectId) {
       res.status(400).send("Provide correct data")
       return;
-    } 
+    }
 
-    const project = await Projects.findOne({_id: projectId})
+    const project = await Projects.findOne({ _id: projectId })
 
     if (!project) {
       res.status(404).send("Not found")
@@ -111,15 +113,15 @@ app.get('/projects/:projectId', async (req, res) => {
 })
 
 app.delete('/projects/:projectId', async (req, res) => {
-  const {projectId} = req.params
+  const { projectId } = req.params
 
   try {
     if (!projectId) {
       res.status(400).send("Provide correct data")
       return;
-    } 
+    }
 
-    await Projects.deleteOne({_id: projectId});
+    await Projects.deleteOne({ _id: projectId });
 
     res.status(204).send(`${projectId} deleted`)
   } catch (err) {
