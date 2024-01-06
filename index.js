@@ -23,7 +23,7 @@ app.get('/projects', async (req, res) => {
   try {
     const projects = await Projects.find({});
 
-    
+    res.status(200).send(projects)
   } catch (err) {
     res.status(500).send(`Unexpected error, ${err.message}`)
   }
